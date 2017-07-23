@@ -16,7 +16,7 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp',(err,db)=>{
     //query id should be 
     /*
     db.collection('Todos').find({
-        _id:new ObjectId('/id you want to find/')
+        _id:new ObjectID('/id you want to find/')
     })
     */
     db.collection('Todos').find({}).count().then((count)=>{
