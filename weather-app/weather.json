@@ -1,0 +1,20 @@
+{
+  "time": 1500600019,
+  "summary": "Partly Cloudy",
+  "icon": "partly-cloudy-night",
+  "nearestStormDistance": 0,
+  "precipIntensity": 0,
+  "precipProbability": 0,
+  "temperature": 83.44,
+  "apparentTemperature": 88.68,
+  "dewPoint": 71.69,
+  "humidity": 0.68,
+  "windSpeed": 1.64,
+  "windGust": 15.31,
+  "windBearing": 286,
+  "visibility": 7.06,
+  "cloudCover": 0.53,
+  "pressure": 1011.02,
+  "ozone": 286.3,
+  "uvIndex": 0
+}
