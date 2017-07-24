@@ -106,8 +106,11 @@ describe('GET /todos/:id',()=>{
 
 describe('DELETE /todos/:id',()=>{
     it ('delete the todo doc',(done)=>{
+        
+        var hexId=todos[0]._id.toHexString();
+
         request(app)
-            .delete(`/todos/${todos[0]._id.toHexString()}`)
+            .delete(`/todos/${hexId}`)
             .expect(200)
             .expect((res)=>{
                 expect(res.body.text).toBe('First test todo')
@@ -115,7 +118,13 @@ describe('DELETE /todos/:id',()=>{
             .end((err,res)=>{
                 if (err){
                     return done(err);
-                }
+                };
+
+                Todo.findById(hexId).then((todo)=>{
+                    expect(todo).toNotExist();
+                    done();
+                })
+
                 Todo.find({}).then((todos)=>{
                     expect(todos.length).toBe(1);
                     expect(todos[0].text).toBe('Second test todo');
