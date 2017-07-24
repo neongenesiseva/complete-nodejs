@@ -122,16 +122,8 @@ describe('DELETE /todos/:id',()=>{
 
                 Todo.findById(hexId).then((todo)=>{
                     expect(todo).toNotExist();
-                    done();
-                })
-
-                Todo.find({}).then((todos)=>{
-                    expect(todos.length).toBe(1);
-                    expect(todos[0].text).toBe('Second test todo');
-                    done()
-                }).catch((err)=>{
-                    done(err)
-                })
+                });
+                
             })//check mongodb Todo collection, check if only one data left
     });
 
