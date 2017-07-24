@@ -5,16 +5,17 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha server/**/*.test.js",
-    "start":"node server/server.js"
+    "start": "node server/server.js"
   },
-  "engines":{
-    "node":"6.10.2"
+  "engines": {
+    "node": "6.10.2"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.17.2",
     "express": "^4.15.3",
+    "lodash": "^4.17.4",
     "mongodb": "^2.2.5",
     "mongoose": "^4.11.4"
   },

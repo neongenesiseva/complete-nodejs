@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var {ObjectID} = require('mongodb');
+const _ = require('lodash');
 
 var {mongoose} = require('./db/mongoose');
 var Todo = require('./models/todo.model');
@@ -66,9 +67,34 @@ app.delete('/todos/:id',(req,res)=>{
     })
 });
 
+//patch make the partial updates
+app.patch('/todos/:id',(req,res)=>{
+    var id = req.params.id;
+    var body = _.pick(req.body,['text','completed'])
+    //return new body object with only text and completed properties
+
+    //validate the id
+    if(!ObjectID.isValid(id)){
+        return res.status(400).send();
+    };
+
+    if (_.isBoolean(body.completed) && body.completed){
+        body.completedAt = new Date().getTime();
+    } else {
+        body.completed = false;
+        body.completedAt = null;
+    };//if request is returning true, then generate a completeAt property
+
+    Todo.findByIdAndUpdate(id,{$set:body},{new:true}).then((todo)=>{
+        res.status(200).send({todo});
+    }).catch((err)=>{
+        res.status(400).send();
+    })//$set the new property with newly updated body object and update the whole document.
+});
+
 app.listen(port,()=>{
     console.log(`server started on ${port}`);
-})
+});
 
 module.exports = {app};
 // same with module.exports.app = app;

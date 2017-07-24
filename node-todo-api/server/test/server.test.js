@@ -7,10 +7,14 @@ const Todo = require('../models/todo.model');
 
 const todos = [{
     _id: new ObjectID(),
-    text:'First test todo'
+    text:'First test todo',
+    completed:false,
+    completedAt:null
 },{
     _id: new ObjectID(),
-    text:'Second test todo'
+    text:'Second test todo',
+    completed:true,
+    completedAt:123
 }]
 
 beforeEach((done)=>{
@@ -19,7 +23,7 @@ beforeEach((done)=>{
     }).then(()=>done());//remove all documents then insert our test data
 });
 
-describe('post /todos',()=>{
+describe('POST /todos',()=>{
     it('should create a new todo',(done)=>{
         var text = 'test todo test';
 
@@ -122,8 +126,9 @@ describe('DELETE /todos/:id',()=>{
 
                 Todo.findById(hexId).then((todo)=>{
                     expect(todo).toNotExist();
+                    done();
                 });
-                
+
             })//check mongodb Todo collection, check if only one data left
     });
 
@@ -142,5 +147,63 @@ describe('DELETE /todos/:id',()=>{
             .delete(`/todos/123`)
             .expect(400)//return bad request
             .end(done);
+    })
+})
+
+describe('PATCH /todos/:id',()=>{
+    it('set true, and get completedAt',(done)=>{
+        var hexId = todos[0]._id;
+        var body = {
+            completed:true,
+            text:'patched note'
+        };
+
+        request(app)
+            .patch(`/todos/${hexId}`)
+            .send(body)
+            .expect(200)
+            .expect((res)=>{
+                expect(res.body.todo.text).toBe('patched note');//res.todo is a JSON file, res.body.todo is a object
+                expect(res.body.todo.completed).toBe(true);
+                expect(res.body.todo.completedAt).toBeA('number');
+            })
+            .end((err,res)=>{
+                if(err){
+                    return done(err)
+                }
+                Todo.find({}).then((todos)=>{
+                    expect(todos.length).toBe(2);
+                    done();
+                }).catch((err)=>{
+                    done(err);
+                })
+            })//make sure it is update, not adding or dropping
+    });
+
+    it('set false, and wipe completeAt',(done)=>{
+        var hexId = todos[1]._id;
+        var body = {
+            completed:false
+        };
+
+        request(app)
+            .patch(`/todos/${hexId}`)
+            .send(body)
+            .expect(200)
+            .expect((res)=>{
+                expect(res.body.todo.completed).toBe(false);
+                expect(res.body.todo.completedAt).toBe(null);
+            })
+            .end((err,res)=>{
+                if(err){
+                    return done(err)
+                }
+                Todo.find({}).then((todos)=>{
+                    expect(todos.length).toBe(2);
+                    done();
+                }).catch((err)=>{
+                    done(err);
+                })
+            })
     })
 })
