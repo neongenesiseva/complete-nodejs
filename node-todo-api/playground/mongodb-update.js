@@ -19,7 +19,7 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp',(err,db)=>{
         console.log(result);
     });
 
-    //$set is a mongodb operator
+    //$set is a mongodb operator, $inc: increase a certain field value by a number, 
     //https://docs.mongodb.com/manual/reference/operator/update/
     //option reference http://mongodb.github.io/node-mongodb-native/2.2/api/Collection.html#findOneAndUpdate
     //option returnOriginal true:return the original value, false:return the updated one
