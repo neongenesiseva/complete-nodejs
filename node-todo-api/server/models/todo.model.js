@@ -20,6 +20,6 @@ var todoSchema = new Schema({
 });
 //defining collection schema
 
-var Todo = mongoose.model('Todo',todoSchema);
+var Todo = mongoose.model('todo',todoSchema);
 //defining collection
 module.exports = Todo;
