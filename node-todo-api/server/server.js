@@ -7,6 +7,7 @@ var Todo = require('./models/todo.model');
 var User = require('./models/user.model');
 
 var app = express();
+const port = process.env.PORT || 3300;
 
 app.use(bodyParser.json());
 //add body-parser as middleware;
@@ -45,10 +46,28 @@ app.get('/todos/:id',(req,res)=>{
     }).catch((e)=>{
         res.status(400).send()
     })
-})
+});
 
-app.listen(3300,()=>{
-    console.log('server started on 3300');
+app.delete('/todos/:id',(req,res)=>{
+    //get the id
+    var id = req.params.id;
+    //validate the id
+    if(!ObjectID.isValid(id)){
+        return res.status(400).send();
+    };
+    //remove todo by id
+    Todo.findByIdAndRemove(id).then((todo)=>{
+        if (!todo){
+            return res.status(404).send()
+        }
+        res.status(200).send(todo);
+    }).catch((err)=>{
+        res.status(400).send();
+    })
+});
+
+app.listen(port,()=>{
+    console.log(`server started on ${port}`);
 })
 
 module.exports = {app};

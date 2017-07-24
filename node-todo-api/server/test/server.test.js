@@ -16,7 +16,7 @@ const todos = [{
 beforeEach((done)=>{
     Todo.remove({}).then(()=>{
         Todo.insertMany(todos);
-    }).then(()=>done());//remove then insert our test data
+    }).then(()=>done());//remove all documents then insert our test data
 });
 
 describe('post /todos',()=>{
@@ -100,6 +100,46 @@ describe('GET /todos/:id',()=>{
         request(app)
             .get(`/todos/123`)
             .expect(404)
+            .end(done);
+    })
+})
+
+describe('DELETE /todos/:id',()=>{
+    it ('delete the todo doc',(done)=>{
+        request(app)
+            .delete(`/todos/${todos[0]._id.toHexString()}`)
+            .expect(200)
+            .expect((res)=>{
+                expect(res.body.text).toBe('First test todo')
+            })
+            .end((err,res)=>{
+                if (err){
+                    return done(err);
+                }
+                Todo.find({}).then((todos)=>{
+                    expect(todos.length).toBe(1);
+                    expect(todos[0].text).toBe('Second test todo');
+                    done()
+                }).catch((err)=>{
+                    done(err)
+                })
+            })//check mongodb Todo collection, check if only one data left
+    });
+
+    it ('return 404 if no todo found',(done)=>{
+        var hexId = new ObjectID().toHexString();
+        //pass a valid hexstring id 
+        request(app)
+            .delete(`/todos/${hexId}`)
+            .expect(404)//return not found
+            .end(done);
+    });
+
+    it('return 404 if the id is invalid',(done)=>{
+        //pass a invalid id
+        request(app)
+            .delete(`/todos/123`)
+            .expect(400)//return bad request
             .end(done);
     })
 })
