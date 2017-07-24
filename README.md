@@ -7,8 +7,10 @@ node-todo-app mainly contains
 
 
 node-test is a test playground
-  //test configration, and unit test
+  with: test configration, and unit test
+	
 node-web-server is a web application using hbs as view engine
-  //partial render, middleware, api
+  with: partial render, middleware, api
+	
 weather-app uses yargs for command line application
-  //callback, promise, filesystem
+  with: callback, promise, filesystem
