@@ -1,3 +1,5 @@
+require('./config/config.js');
+
 var express = require('express');
 var bodyParser = require('body-parser');
 var {ObjectID} = require('mongodb');
@@ -8,7 +10,7 @@ var Todo = require('./models/todo.model');
 var User = require('./models/user.model');
 
 var app = express();
-const port = process.env.PORT || 3300;
+const port = process.env.PORT;
 
 app.use(bodyParser.json());
 //add body-parser as middleware;
