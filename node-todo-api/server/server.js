@@ -8,6 +8,7 @@ const _ = require('lodash');
 var {mongoose} = require('./db/mongoose');
 var Todo = require('./models/todo.model');
 var User = require('./models/user.model');
+var authenticate = require('./middleware/authenticate');
 
 var app = express();
 const port = process.env.PORT;
@@ -110,6 +111,11 @@ app.post('/users',(req,res)=>{
         res.status(400).send(err);
     })
 });
+
+app.get('/users/me',authenticate,(req,res)=>{
+    res.send(req.user);
+});
+//authenticate middleware were defined seperately
 
 app.listen(port,()=>{
     console.log(`server started on ${port}`);

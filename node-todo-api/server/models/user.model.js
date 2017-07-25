@@ -4,7 +4,10 @@ var {mongoose} = require('../db/mongoose');
 const _ = require('lodash');
 
 var Schema = mongoose.Schema;
-
+/*
+    methods are set for instance(document);
+    statics are set for model(collection);
+*/
 var UserSchema = new Schema({
     email:{
         type:String,
@@ -44,6 +47,7 @@ UserSchema.methods.toJSON = function(){
     //return only _id and email not the token
     //token were return to header
 };
+//specify what data to send back to user
 
 
 UserSchema.methods.generateAuthToken = function(){
@@ -58,6 +62,29 @@ UserSchema.methods.generateAuthToken = function(){
     });
 };
 //we need this key word here, so we use regular function
+
+UserSchema.statics.findByToken = function(token){
+    var User = this;
+    var decoded;
+
+    try{
+        decoded = jwt.verify(token,'abc123');
+        //jwt.verify(token,key);
+    } catch(e){
+        // return new Promise((resolve,reject)={
+        //     reject();
+        // });
+        return Promise.reject();
+
+    }
+    
+    return User.findOne({
+        '_id':decoded._id,
+        'tokens.token':token,
+        'tokens.access':'auth'
+    });
+};
+
 
 var User = mongoose.model('User',UserSchema);
 //defining collection
