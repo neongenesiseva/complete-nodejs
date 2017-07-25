@@ -107,8 +107,10 @@ app.post('/users',(req,res)=>{
         //the user with token saved successfully
     }).then((token)=>{
         res.header('x-auth',token).status(201).send(user);
+        //write x-auth is header, with value of token genderated
     }).catch((err)=>{
         res.status(400).send(err);
+        //all the errors occurs in schema will send to here
     })
 });
 
