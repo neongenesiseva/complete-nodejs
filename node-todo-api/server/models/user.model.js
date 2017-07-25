@@ -2,6 +2,7 @@ const validator = require('validator');
 const jwt = require('jsonwebtoken');
 var {mongoose} = require('../db/mongoose');
 const _ = require('lodash');
+const bcrypt = require('bcryptjs');
 
 var Schema = mongoose.Schema;
 /*
@@ -85,6 +86,25 @@ UserSchema.statics.findByToken = function(token){
     });
 };
 
+UserSchema.pre('save',function(next){
+    var user = this;
+    
+    //chech if user instance, password property is modified -> a mongoose method
+    if(user.isModified('password')){
+        bcrypt.genSalt(10,(err,salt)=>{
+        bcrypt.hash(user.password,salt,(err,hash)=>{
+        if (err){
+            return err
+            }
+            user.password = hash;
+            next();
+            });
+        });
+    } else {
+        next();
+    }
+});
+//mongoose middleware, do this previous 'save' event, to salt and hash the password
 
 var User = mongoose.model('User',UserSchema);
 //defining collection
