@@ -94,6 +94,23 @@ app.patch('/todos/:id',(req,res)=>{
     })//$set the new property with newly updated body object and update the whole document.
 });
 
+app.post('/users',(req,res)=>{
+    var body = _.pick(req.body,['email','password']);//only　these two are allowed to be input
+    //in case of user pass a token directly to server
+    var user = new User(body);
+    
+    user.save().then((user)=>{
+        return user.generateAuthToken();
+        //this return a token, another promise, so we can chaining promise 
+        //and user with token was saved in this, we need promises to ensure
+        //the user with token saved successfully
+    }).then((token)=>{
+        res.header('x-auth',token).status(201).send(user);
+    }).catch((err)=>{
+        res.status(400).send(err);
+    })
+});
+
 app.listen(port,()=>{
     console.log(`server started on ${port}`);
 });
