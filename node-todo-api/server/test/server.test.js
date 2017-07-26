@@ -16,6 +16,7 @@ describe('POST /todos',()=>{
 
         request(app)
             .post('/todos')//use app.post('/todos)
+            .set('x-auth',users[0].tokens[0].token)
             .send({text}) //pass text data 
             .expect(201)  //expect status code return 200, in this case 201
             .expect((res)=>{
@@ -38,6 +39,7 @@ describe('POST /todos',()=>{
     it('should not create todo',(done)=>{
         request(app)
             .post('/todos')
+            .set('x-auth',users[0].tokens[0].token)
             .send({})
             .expect(400)
             .end((err,res)=>{
@@ -58,9 +60,10 @@ describe('GET /todos',()=>{
     it ('should get all todos',(done)=>{
         request(app)
             .get('/todos')
+            .set('x-auth',users[0].tokens[0].token)
             .expect(200)
             .expect((res)=>{
-                expect(res.body.todos.length).toBe(2);
+                expect(res.body.todos.length).toBe(1);
             })
             .end(done);
     });
@@ -70,10 +73,19 @@ describe('GET /todos/:id',()=>{
     it ('get the todo doc',(done)=>{
         request(app)
             .get(`/todos/${todos[0]._id.toHexString()}`)
+            .set('x-auth',users[0].tokens[0].token)
             .expect(200)
             .expect((res)=>{
                 expect(res.body.todo.text).toBe('First test todo');
             })
+            .end(done);
+    });
+
+    it ('should not return todo doc create by other user',(done)=>{
+        request(app)
+            .get(`/todos/${todos[1]._id.toHexString()}`)
+            .set('x-auth',users[0].tokens[0].token)
+            .expect(404)
             .end(done);
     });
 
@@ -82,6 +94,7 @@ describe('GET /todos/:id',()=>{
         //pass a valid hexstring id 
         request(app)
             .get(`/todos/${hexId}`)
+            .set('x-auth',users[0].tokens[0].token)
             .expect(404)
             .end(done);
     });
@@ -90,6 +103,7 @@ describe('GET /todos/:id',()=>{
         //pass a invalid id
         request(app)
             .get(`/todos/123`)
+            .set('x-auth',users[0].tokens[0].token)
             .expect(404)
             .end(done);
     })
@@ -102,6 +116,7 @@ describe('DELETE /todos/:id',()=>{
 
         request(app)
             .delete(`/todos/${hexId}`)
+            .set('x-auth',users[0].tokens[0].token)
             .expect(200)
             .expect((res)=>{
                 expect(res.body.text).toBe('First test todo')
@@ -119,11 +134,33 @@ describe('DELETE /todos/:id',()=>{
             })//check mongodb Todo collection, check if only one data left
     });
 
+    // it ('not delete if not the author',(done)=>{
+        
+    //     var hexId=todos[1]._id.toHexString();
+
+    //     request(app)
+    //         .delete(`/todos/${hexId}`)
+    //         .set('x-auth',users[0].tokens[0].token)
+    //         .expect(404)
+    //         .end((err,res)=>{
+    //             if (err){
+    //                 return done(err);
+    //             };
+
+    //             Todo.findById(hexId).then((todo)=>{
+    //                 expect(todo).toExist();
+    //                 done();
+    //             });
+
+    //         })//check mongodb Todo collection, check if only one data left
+    // });
+
     it ('return 404 if no todo found',(done)=>{
         var hexId = new ObjectID().toHexString();
         //pass a valid hexstring id 
         request(app)
             .delete(`/todos/${hexId}`)
+            .set('x-auth',users[0].tokens[0].token)
             .expect(404)//return not found
             .end(done);
     });
@@ -132,6 +169,7 @@ describe('DELETE /todos/:id',()=>{
         //pass a invalid id
         request(app)
             .delete(`/todos/123`)
+            .set('x-auth',users[0].tokens[0].token)
             .expect(400)//return bad request
             .end(done);
     })
@@ -139,7 +177,7 @@ describe('DELETE /todos/:id',()=>{
 
 describe('PATCH /todos/:id',()=>{
     it('set true, and get completedAt',(done)=>{
-        var hexId = todos[0]._id;
+        var hexId = todos[0]._id.toHexString();
         var body = {
             completed:true,
             text:'patched note'
@@ -147,6 +185,7 @@ describe('PATCH /todos/:id',()=>{
 
         request(app)
             .patch(`/todos/${hexId}`)
+            .set('x-auth',users[0].tokens[0].token)
             .send(body)
             .expect(200)
             .expect((res)=>{
@@ -167,14 +206,30 @@ describe('PATCH /todos/:id',()=>{
             })//make sure it is update, not adding or dropping
     });
 
+    it('not update, if not the author',(done)=>{
+        var hexId = todos[1]._id.toHexString();
+        var body = {
+            completed:true,
+            text:'patched note'
+        };
+
+        request(app)
+            .patch(`/todos/${hexId}`)
+            .set('x-auth',users[0].tokens[0].token)
+            .send(body)
+            .expect(400)
+            .end(done)//make sure it is update, not adding or dropping
+    });
+
     it('set false, and wipe completeAt',(done)=>{
-        var hexId = todos[1]._id;
+        var hexId = todos[0]._id;
         var body = {
             completed:false
         };
 
         request(app)
             .patch(`/todos/${hexId}`)
+            .set('x-auth',users[0].tokens[0].token)
             .send(body)
             .expect(200)
             .expect((res)=>{

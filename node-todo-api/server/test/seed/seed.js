@@ -10,12 +10,14 @@ const todos = [{
     _id: new ObjectID(),
     text:'First test todo',
     completed:false,
-    completedAt:null
+    completedAt:null,
+    _creator:userOneId
 },{
     _id: new ObjectID(),
     text:'Second test todo',
     completed:true,
-    completedAt:123
+    completedAt:123,
+    _creator:userTwoId
 }];
 
 const users = [{

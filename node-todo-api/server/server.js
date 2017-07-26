@@ -16,9 +16,10 @@ const port = process.env.PORT;
 app.use(bodyParser.json());
 //add body-parser as middleware;
 
-app.post('/todos',(req,res)=>{
+app.post('/todos',authenticate,(req,res)=>{
     var todo = new Todo({
-        text:req.body.text
+        text:req.body.text,
+        _creator:req.user._id
     });
 
     todo.save().then((doc)=>{
@@ -27,22 +28,29 @@ app.post('/todos',(req,res)=>{
         res.status(400).send(err);
     })
 });
+//should first add token in header of todos page.
+//with authenticate middleware 
 
-app.get('/todos',(req,res)=>{
-    Todo.find({}).then((todos)=>{
+app.get('/todos',authenticate,(req,res)=>{
+    Todo.find({
+        _creator:req.user._id
+    }).then((todos)=>{
         res.status(200).send({todos});
     },(e)=>{
         res.status(400).send(e);
     })
 });
 
-app.get('/todos/:id',(req,res)=>{
+app.get('/todos/:id',authenticate,(req,res)=>{
     var id = req.params.id;
     //valid i using isValid;
     if (!ObjectID.isValid(id)){
         return res.status(404).send();
     };
-    Todo.findById(id).then((todo)=>{
+    Todo.findOne({
+        _id:id,
+        _creator:req.user.id
+    }).then((todo)=>{
         if (!todo){
             return res.status(404).send()
         }
@@ -52,7 +60,7 @@ app.get('/todos/:id',(req,res)=>{
     })
 });
 
-app.delete('/todos/:id',(req,res)=>{
+app.delete('/todos/:id',authenticate,(req,res)=>{
     //get the id
     var id = req.params.id;
     //validate the id
@@ -60,7 +68,10 @@ app.delete('/todos/:id',(req,res)=>{
         return res.status(400).send();
     };
     //remove todo by id
-    Todo.findByIdAndRemove(id).then((todo)=>{
+    Todo.findOneAndRemove({
+        _id:id,
+        _creator:req.user._id
+    }).then((todo)=>{
         if (!todo){
             return res.status(404).send()
         }
@@ -71,7 +82,7 @@ app.delete('/todos/:id',(req,res)=>{
 });
 
 //patch make the partial updates
-app.patch('/todos/:id',(req,res)=>{
+app.patch('/todos/:id',authenticate,(req,res)=>{
     var id = req.params.id;
     var body = _.pick(req.body,['text','completed'])
     //return new body object with only text and completed properties
@@ -88,7 +99,7 @@ app.patch('/todos/:id',(req,res)=>{
         body.completedAt = null;
     };//if request is returning true, then generate a completeAt property
 
-    Todo.findByIdAndUpdate(id,{$set:body},{new:true}).then((todo)=>{
+    Todo.findOneAndUpdate({_id:id,_creator:req.user._id},{$set:body},{new:true}).then((todo)=>{
         res.status(200).send({todo});
     }).catch((err)=>{
         res.status(400).send();
