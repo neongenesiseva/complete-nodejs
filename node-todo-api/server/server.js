@@ -140,6 +140,7 @@ app.delete('/users/me/token',authenticate,(req,res)=>{
         res.status(400).send();
     })
 })
+//remove all tokens in database, thus no compare would complete, everytime the user login, mongodb will generate a new token and send to header
 
 app.listen(port,()=>{
     console.log(`server started on ${port}`);
