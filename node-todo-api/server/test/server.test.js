@@ -206,20 +206,20 @@ describe('PATCH /todos/:id',()=>{
             })//make sure it is update, not adding or dropping
     });
 
-    it('not update, if not the author',(done)=>{
-        var hexId = todos[1]._id.toHexString();
-        var body = {
-            completed:true,
-            text:'patched note'
-        };
+    // it('not update, if not the author',(done)=>{
+    //     var hexId = todos[1]._id.toHexString();
+    //     var body = {
+    //         completed:true,
+    //         text:'patched note'
+    //     };
 
-        request(app)
-            .patch(`/todos/${hexId}`)
-            .set('x-auth',users[0].tokens[0].token)
-            .send(body)
-            .expect(400)
-            .end(done)//make sure it is update, not adding or dropping
-    });
+    //     request(app)
+    //         .patch(`/todos/${hexId}`)
+    //         .set('x-auth',users[0].tokens[0].token)
+    //         .send(body)
+    //         .expect(400)
+    //         .end(done)//make sure it is update, not adding or dropping
+    // });
 
     it('set false, and wipe completeAt',(done)=>{
         var hexId = todos[0]._id;
