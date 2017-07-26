@@ -64,6 +64,16 @@ UserSchema.methods.generateAuthToken = function(){
 };
 //we need this key word here, so we use regular function
 
+UserSchema.methods.removeToken = function(token){
+    var user = this;
+    return user.update({
+        $pull:{
+            tokens:{token}
+        }
+        //$pull:{field:{condition}}
+    });
+}
+
 UserSchema.statics.findByToken = function(token){
     var User = this;
     var decoded;

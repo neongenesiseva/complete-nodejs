@@ -131,6 +131,16 @@ app.get('/users/me',authenticate,(req,res)=>{
 });
 //authenticate middleware were defined seperately
 
+app.delete('/users/me/token',authenticate,(req,res)=>{
+    //req.user and req.token are get from middleware authenticate
+    req.user.removeToken(req.token).then(()=>{
+        res.status(200).send();
+        //the user is get from User.find so it is an instance of mongodb, thus it could have Schema.methods.
+    },()=>{
+        res.status(400).send();
+    })
+})
+
 app.listen(port,()=>{
     console.log(`server started on ${port}`);
 });
